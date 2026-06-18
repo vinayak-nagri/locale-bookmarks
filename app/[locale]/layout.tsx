@@ -1,3 +1,4 @@
+import Providers from '@/app/providers';
 import {NextIntlClientProvider, hasLocale} from 'next-intl';
 import {notFound} from 'next/navigation';
 import {routing} from '@/i18n/routing';
@@ -20,7 +21,9 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <body>
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+            <Providers>{children}</Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
