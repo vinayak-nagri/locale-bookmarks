@@ -4,7 +4,9 @@ import {useQuery} from '@tanstack/react-query';
 import AppButton from '@/components/AppButton';
 import {fetchBookmarks} from '@/lib/bookmarks';
 
-export default function BookmarkList() {
+type BookmarkListProps = { onAdd: () => void };
+
+export default function BookmarkList({ onAdd }: BookmarkListProps) {
   const {data, isLoading, isError, isFetching, refetch} = useQuery({
     queryKey: ['bookmarks'],
     queryFn: fetchBookmarks,
@@ -36,7 +38,7 @@ export default function BookmarkList() {
     return (
       <div>
         <p>No bookmarks yet.</p>
-        <AppButton variant="contained">
+        <AppButton variant="contained" onClick={onAdd}>
           Add your first bookmark
         </AppButton>
       </div>

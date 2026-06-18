@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import type { BookmarkInput } from '@/lib/schema';
 
 export type Bookmark = {
   id: string;
@@ -15,4 +16,9 @@ export async function fetchBookmarks(): Promise<Bookmark[]> {
 
   if (error) throw error;
   return data ?? [];
+}
+
+export async function addBookmark(input: BookmarkInput): Promise<void> {
+  const { error } = await supabase.from('bookmarks').insert(input);
+  if (error) throw error;
 }
