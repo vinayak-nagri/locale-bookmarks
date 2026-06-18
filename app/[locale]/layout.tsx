@@ -1,3 +1,4 @@
+import {AppRouterCacheProvider} from '@mui/material-nextjs/v15-appRouter';
 import Providers from '@/app/providers';
 import {NextIntlClientProvider, hasLocale} from 'next-intl';
 import {notFound} from 'next/navigation';
@@ -21,9 +22,12 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <body>
-        <NextIntlClientProvider>
-            <Providers>{children}</Providers>
-        </NextIntlClientProvider>
+        <AppRouterCacheProvider>
+            <NextIntlClientProvider>
+                <Providers>{children}</Providers>
+            </NextIntlClientProvider>
+        </AppRouterCacheProvider>
+        
       </body>
     </html>
   );

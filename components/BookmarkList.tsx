@@ -1,24 +1,49 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { fetchBookmarks } from '@/lib/bookmarks';
+import {useQuery} from '@tanstack/react-query';
+import AppButton from '@/components/AppButton';
+import {fetchBookmarks} from '@/lib/bookmarks';
 
 export default function BookmarkList() {
-  const { data, isLoading, isError } = useQuery({
+  const {data, isLoading, isError, isFetching, refetch} = useQuery({
     queryKey: ['bookmarks'],
     queryFn: fetchBookmarks,
   });
 
   if (isLoading) {
-    return <p>Loading your bookmarks…</p>;            // Loading
+    return <p>Loading your bookmarks…</p>; // Loading
   }
+
   if (isError) {
-    return <p>Could not load your bookmarks.</p>;       // Error
+    return (
+      <div>
+        <p>Could not load your bookmarks.</p>
+        <AppButton
+          variant="outlined"
+          loading={isFetching}
+          loadingText="Retrying..."
+          onClick={() => {
+            void refetch();
+          }}
+        >
+          Retry
+        </AppButton>
+      </div>
+    ); // Error
   }
+
   if (!data || data.length === 0) {
-    return <p>No bookmarks yet.</p>;                   // Empty
+    return (
+      <div>
+        <p>No bookmarks yet.</p>
+        <AppButton variant="contained">
+          Add your first bookmark
+        </AppButton>
+      </div>
+    ); // Empty
   }
-  return (                                             // Success
+
+  return (
     <ul>
       {data.map((b) => (
         <li key={b.id}>
@@ -26,5 +51,5 @@ export default function BookmarkList() {
         </li>
       ))}
     </ul>
-  );
+  ); // Success
 }
