@@ -4,6 +4,7 @@ import {useQuery} from '@tanstack/react-query';
 import AppButton from '@/components/AppButton';
 import {fetchBookmarks} from '@/lib/bookmarks';
 import { useTranslations } from 'next-intl';
+import Skeleton from '@mui/material/Skeleton';
 
 type BookmarkListProps = { onAdd: () => void };
 
@@ -16,7 +17,16 @@ export default function BookmarkList({ onAdd }: BookmarkListProps) {
   const t = useTranslations('home');
 
   if (isLoading) {
-    return <p>{t('loading')}</p>; // Loading
+    return (
+      <ul role="status" aria-label={t('loading')} aria-busy="true">
+        {Array.from({length: 3}, (_, i) => (
+          <li key={i}>
+            <Skeleton variant="text" width="55%" />
+            <Skeleton variant="text" width="35%" />
+          </li>
+        ))}
+      </ul>
+    );
   }
 
   if (isError) {
