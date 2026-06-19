@@ -1,6 +1,6 @@
 {
   "home": {
-    "title": "My bookmarks",
+    "title": "My Bookmarks",
     "add": "Add bookmark",
     "loading": "Loading your bookmarks…",
     "error": "Could not load your bookmarks.",
@@ -9,7 +9,10 @@
     "empty": {
       "message": "No bookmarks yet.",
       "cta": "Add your first bookmark"
-    }
+    },
+    "openLink": "Open link",
+    "copyLink": "Copy link",
+    "copied": "Copied"
   },
   "form": {
     "title": "Title",
@@ -20,3 +23,5 @@
     "error": "Could not save your bookmark. Please try again."
   }
 }
+
+
