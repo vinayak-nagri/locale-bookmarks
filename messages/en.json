@@ -1,1 +1,22 @@
-{ "home": { "title": "Locale Bookmarks" } }
+{
+  "home": {
+    "title": "My bookmarks",
+    "add": "Add bookmark",
+    "loading": "Loading your bookmarks…",
+    "error": "Could not load your bookmarks.",
+    "retry": "Retry",
+    "retrying": "Retrying...",
+    "empty": {
+      "message": "No bookmarks yet.",
+      "cta": "Add your first bookmark"
+    }
+  },
+  "form": {
+    "title": "Title",
+    "url": "URL",
+    "save": "Save bookmark",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "error": "Could not save your bookmark. Please try again."
+  }
+}

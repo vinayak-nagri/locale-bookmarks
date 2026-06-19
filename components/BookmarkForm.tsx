@@ -10,6 +10,7 @@ import Alert from '@mui/material/Alert';
 import AppButton from '@/components/AppButton';
 import { addBookmark } from '@/lib/bookmarks';
 import { bookmarkSchema, type BookmarkInput } from '@/lib/schema';
+import { useTranslations } from 'next-intl';
 
 type BookmarkFormProps = {
   onSuccess?: () => void;
@@ -17,6 +18,7 @@ type BookmarkFormProps = {
 };
 
 export default function BookmarkForm({ onSuccess, onCancel }: BookmarkFormProps) {
+  const t = useTranslations('form');
   const queryClient = useQueryClient();
 
   const {
@@ -47,12 +49,12 @@ export default function BookmarkForm({ onSuccess, onCancel }: BookmarkFormProps)
       <Stack spacing={2} sx={{ mt: 1 }}>
         {mutation.isError && (
           <Alert severity="error">
-            Could not save your bookmark. Please try again.
+            {t('error')}
           </Alert>
         )}
 
         <TextField
-          label="Title"
+          label={t('title')}
           fullWidth
           {...register('title')}
           error={Boolean(errors.title)}
@@ -60,7 +62,7 @@ export default function BookmarkForm({ onSuccess, onCancel }: BookmarkFormProps)
         />
 
         <TextField
-          label="URL"
+          label={t('url')}
           fullWidth
           {...register('url')}
           error={Boolean(errors.url)}
@@ -70,16 +72,16 @@ export default function BookmarkForm({ onSuccess, onCancel }: BookmarkFormProps)
         <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end'}}>
           {onCancel && (
             <Button onClick={onCancel} disabled={mutation.isPending}>
-              Cancel
+              {t('cancel')}
             </Button>
           )}
           <AppButton
             type="submit"
             variant="contained"
             loading={mutation.isPending}
-            loadingText="Saving..."
+            loadingText={t('saving')}
           >
-            Save bookmark
+            {t('save')}
           </AppButton>
         </Stack>
       </Stack>

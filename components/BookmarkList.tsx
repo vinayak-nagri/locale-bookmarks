@@ -3,6 +3,7 @@
 import {useQuery} from '@tanstack/react-query';
 import AppButton from '@/components/AppButton';
 import {fetchBookmarks} from '@/lib/bookmarks';
+import { useTranslations } from 'next-intl';
 
 type BookmarkListProps = { onAdd: () => void };
 
@@ -12,23 +13,25 @@ export default function BookmarkList({ onAdd }: BookmarkListProps) {
     queryFn: fetchBookmarks,
   });
 
+  const t = useTranslations('home');
+
   if (isLoading) {
-    return <p>Loading your bookmarks…</p>; // Loading
+    return <p>{t('loading')}</p>; // Loading
   }
 
   if (isError) {
     return (
       <div>
-        <p>Could not load your bookmarks.</p>
+        <p>{t('error')}</p>
         <AppButton
           variant="outlined"
           loading={isFetching}
-          loadingText="Retrying..."
+          loadingText={t('retrying')}
           onClick={() => {
             void refetch();
           }}
         >
-          Retry
+          {t('retry')}
         </AppButton>
       </div>
     ); // Error
@@ -37,9 +40,9 @@ export default function BookmarkList({ onAdd }: BookmarkListProps) {
   if (!data || data.length === 0) {
     return (
       <div>
-        <p>No bookmarks yet.</p>
+        <p>{t('empty.message')}</p>
         <AppButton variant="contained" onClick={onAdd}>
-          Add your first bookmark
+          {t('empty.cta')}
         </AppButton>
       </div>
     ); // Empty
