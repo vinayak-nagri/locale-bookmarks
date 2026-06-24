@@ -1,12 +1,3 @@
--- Drop the original open policies (anon, true) — they defeat per-user scoping.
-drop policy if exists "Anyone can read bookmarks" on bookmarks;
-drop policy if exists "Anyone can insert bookmarks" on bookmarks;
-
--- RLS already enabled on both tables (bookmarks: original setup; profiles: 0002).
--- Re-asserting is idempotent and makes this file self-contained as the policy record.
-alter table bookmarks enable row level security;
-alter table profiles  enable row level security;
-
 -- ── bookmarks: identity test is auth.uid() = user_id ──
 create policy "Users select own bookmarks"
   on bookmarks for select to authenticated
