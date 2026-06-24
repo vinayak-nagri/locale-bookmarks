@@ -9,13 +9,23 @@ import AppButton from '@/components/AppButton';
 import BookmarkList from '@/components/BookmarkList';
 import BookmarkDialog from '@/components/BookmarkDialog';
 import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/navigation';
+import { supabase } from '@/lib/supabase';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import Typography from '@mui/material/Typography';
 
 
 export default function BookmarksView() {
   const t = useTranslations('home');
+  const authT = useTranslations('auth');
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    router.push('/signin');
+    router.refresh();
+  }
 
   return (
     <Container maxWidth="sm" sx={{ py: 4, px: { xs: 2, sm: 3 } }}>
@@ -24,6 +34,9 @@ export default function BookmarksView() {
           <Typography variant="h5" component="h1">{t('title')}</Typography>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <LanguageSwitcher />
+            <AppButton variant="outlined" onClick={() => { void handleSignOut(); }}>
+              {authT('signout')}
+            </AppButton>
             <AppButton variant="contained" onClick={() => setOpen(true)}>
               {t('add')}
             </AppButton>

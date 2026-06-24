@@ -8,4 +8,9 @@ export const bookmarkSchema = z.object({
   url: z.string().url('Enter a valid URL'),
 });
 
+export const authSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+
 export type BookmarkInput = z.infer<typeof bookmarkSchema>;

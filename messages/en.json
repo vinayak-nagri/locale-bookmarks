@@ -21,7 +21,19 @@
     "saving": "Saving...",
     "cancel": "Cancel",
     "error": "Could not save your bookmark. Please try again."
+  },
+  "auth": {
+    "signinTitle": "Sign in",
+    "signupTitle": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "signin": "Sign in",
+    "signup": "Sign up",
+    "submitting": "Submitting...",
+    "signout": "Sign out",
+    "error": "Could not complete authentication. Please try again.",
+    "toSignup": "Need an account? Sign up",
+    "toSignin": "Already have an account? Sign in"
   }
 }
-
 
