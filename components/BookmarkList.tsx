@@ -15,9 +15,10 @@ import { alpha } from '@mui/material/styles';
 type BookmarkListProps = {
   onAdd: () => void;
   onEdit: (bookmark: Bookmark) => void;
+  onDelete: (bookmark: Bookmark) => void;
 };
 
-export default function BookmarkList({ onAdd, onEdit }: BookmarkListProps) {
+export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListProps) {
   const {data, isLoading, isError, isFetching, refetch} = useQuery({
     queryKey: ['bookmarks'],
     queryFn: fetchBookmarks,
@@ -125,13 +126,29 @@ export default function BookmarkList({ onAdd, onEdit }: BookmarkListProps) {
           <Box sx={{ flexGrow: 1, minWidth: 0 }}>
             <Typography variant="body1" sx={{ fontWeight: 500 }}>{b.title}</Typography>
           </Box>
-          <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+              flexShrink: 0,
+              flexWrap: 'wrap',
+              justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+            }}
+          >
             <AppButton
               variant="text"
               size="small"
               onClick={() => onEdit(b)}
             >
               {t('edit')}
+            </AppButton>
+            <AppButton
+              variant="text"
+              color="error"
+              size="small"
+              onClick={() => onDelete(b)}
+            >
+              {t('delete')}
             </AppButton>
             <AppButton
               variant="outlined"

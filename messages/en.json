@@ -15,7 +15,13 @@
     "copied": "Copied",
     "profile": "Profile",
     "edit": "Edit",
-    "editTitle": "Edit bookmark"
+    "editTitle": "Edit bookmark",
+    "delete": "Delete",
+    "deleteTitle": "Delete bookmark",
+    "deleteBody": "Are you sure you want to delete this bookmark?",
+    "deleteConfirm": "Delete",
+    "deleteCancel": "Cancel",
+    "deleteError": "Could not delete the bookmark. Please try again."
   },
   "form": {
     "title": "Title",

@@ -30,3 +30,8 @@ export async function updateBookmark(
   const { error } = await supabase.from('bookmarks').update(values).eq('id', id);
   if (error) throw error;
 }
+
+export async function deleteBookmark(id: string): Promise<void> {
+  const { error } = await supabase.from('bookmarks').delete().eq('id', id);
+  if (error) throw error;
+}
