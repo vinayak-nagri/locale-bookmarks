@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import createMiddleware from 'next-intl/middleware';
-import type { NextRequest } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import {routing} from './i18n/routing';
 
 const handleI18nRouting = createMiddleware(routing);
@@ -26,7 +26,28 @@ export default async function middleware(request: NextRequest) {
     }
   );
 
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const pathname = request.nextUrl.pathname;
+  const pathLocale = pathname.split('/')[1];
+  const locale = routing.locales.some((configuredLocale) => configuredLocale === pathLocale)
+    ? pathLocale
+    : routing.defaultLocale;
+  const isProtectedProfileRoute =
+    pathname === `/${locale}/profile` || pathname.startsWith(`/${locale}/profile/`);
+
+  if (isProtectedProfileRoute && !user) {
+    const redirectUrl = new URL(`/${locale}/signin`, request.url);
+    const redirectResponse = NextResponse.redirect(redirectUrl);
+
+    response.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie);
+    });
+
+    return redirectResponse;
+  }
 
   return response;
 }
