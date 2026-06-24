@@ -12,7 +12,8 @@
     },
     "openLink": "Open link",
     "copyLink": "Copy link",
-    "copied": "Copied"
+    "copied": "Copied",
+    "profile": "Profile"
   },
   "form": {
     "title": "Title",
@@ -40,5 +41,16 @@
     "body": "Sign in to save and organize your bookmarks.",
     "signin": "Sign in",
     "signup": "Create an account"
+  },
+  "profile": {
+    "title": "Profile",
+    "displayNameLabel": "Display name",
+    "localeLabel": "Preferred language",
+    "localeEn": "English",
+    "localeAr": "Arabic",
+    "save": "Save profile",
+    "saving": "Saving...",
+    "success": "Profile saved.",
+    "error": "Could not save your profile. Please try again."
   }
 }

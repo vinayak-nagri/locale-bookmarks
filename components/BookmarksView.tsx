@@ -9,7 +9,7 @@ import AppButton from '@/components/AppButton';
 import BookmarkList from '@/components/BookmarkList';
 import BookmarkDialog from '@/components/BookmarkDialog';
 import { useTranslations } from 'next-intl';
-import { useRouter } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { supabase } from '@/lib/supabase';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import Typography from '@mui/material/Typography';
@@ -34,6 +34,9 @@ export default function BookmarksView() {
           <Typography variant="h5" component="h1">{t('title')}</Typography>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <LanguageSwitcher />
+            <AppButton component={Link} href="/profile" variant="text">
+              {t('profile')}
+            </AppButton>
             <AppButton variant="outlined" onClick={() => { void handleSignOut(); }}>
               {authT('signout')}
             </AppButton>

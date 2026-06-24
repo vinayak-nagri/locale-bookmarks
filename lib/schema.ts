@@ -13,4 +13,13 @@ export const authSchema = z.object({
   password: z.string().min(6),
 });
 
+export const profileSchema = z.object({
+  display_name: z
+    .string()
+    .min(1, 'Display name is required')
+    .max(120, 'Display name must be 120 characters or fewer'),
+  preferred_locale: z.enum(['en', 'ar']),
+});
+
 export type BookmarkInput = z.infer<typeof bookmarkSchema>;
+export type ProfileInput = z.infer<typeof profileSchema>;
