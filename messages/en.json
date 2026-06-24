@@ -13,7 +13,9 @@
     "openLink": "Open link",
     "copyLink": "Copy link",
     "copied": "Copied",
-    "profile": "Profile"
+    "profile": "Profile",
+    "edit": "Edit",
+    "editTitle": "Edit bookmark"
   },
   "form": {
     "title": "Title",

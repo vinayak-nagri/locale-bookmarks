@@ -22,3 +22,11 @@ export async function addBookmark(input: BookmarkInput): Promise<void> {
   const { error } = await supabase.from('bookmarks').insert(input);
   if (error) throw error;
 }
+
+export async function updateBookmark(
+  id: string,
+  values: { title: string; url: string }
+): Promise<void> {
+  const { error } = await supabase.from('bookmarks').update(values).eq('id', id);
+  if (error) throw error;
+}

@@ -11,6 +11,7 @@ import BookmarkDialog from '@/components/BookmarkDialog';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { supabase } from '@/lib/supabase';
+import type { Bookmark } from '@/lib/bookmarks';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import Typography from '@mui/material/Typography';
 
@@ -20,6 +21,7 @@ export default function BookmarksView() {
   const authT = useTranslations('auth');
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [editingBookmark, setEditingBookmark] = useState<Bookmark | null>(null);
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -48,9 +50,19 @@ export default function BookmarksView() {
 
         <Divider />
 
-        <BookmarkList onAdd={() => setOpen(true)} />
+        <BookmarkList onAdd={() => setOpen(true)} onEdit={setEditingBookmark} />
 
-        <BookmarkDialog open={open} onClose={() => setOpen(false)} />
+        <BookmarkDialog
+          open={open}
+          title={t('add')}
+          onClose={() => setOpen(false)}
+        />
+        <BookmarkDialog
+          open={Boolean(editingBookmark)}
+          title={t('editTitle')}
+          bookmark={editingBookmark}
+          onClose={() => setEditingBookmark(null)}
+        />
       </Stack>
     </Container>
   );

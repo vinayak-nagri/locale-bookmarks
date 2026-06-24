@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import {useQuery} from '@tanstack/react-query';
 import AppButton from '@/components/AppButton';
-import {fetchBookmarks} from '@/lib/bookmarks';
+import {fetchBookmarks, type Bookmark} from '@/lib/bookmarks';
 import { useTranslations } from 'next-intl';
 import Skeleton from '@mui/material/Skeleton';
 import Box from '@mui/material/Box';
@@ -12,9 +12,12 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 
-type BookmarkListProps = { onAdd: () => void };
+type BookmarkListProps = {
+  onAdd: () => void;
+  onEdit: (bookmark: Bookmark) => void;
+};
 
-export default function BookmarkList({ onAdd }: BookmarkListProps) {
+export default function BookmarkList({ onAdd, onEdit }: BookmarkListProps) {
   const {data, isLoading, isError, isFetching, refetch} = useQuery({
     queryKey: ['bookmarks'],
     queryFn: fetchBookmarks,
@@ -123,6 +126,13 @@ export default function BookmarkList({ onAdd }: BookmarkListProps) {
             <Typography variant="body1" sx={{ fontWeight: 500 }}>{b.title}</Typography>
           </Box>
           <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
+            <AppButton
+              variant="text"
+              size="small"
+              onClick={() => onEdit(b)}
+            >
+              {t('edit')}
+            </AppButton>
             <AppButton
               variant="outlined"
               size="small"

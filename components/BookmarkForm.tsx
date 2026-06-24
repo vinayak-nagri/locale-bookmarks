@@ -8,16 +8,17 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import AppButton from '@/components/AppButton';
-import { addBookmark } from '@/lib/bookmarks';
+import { addBookmark, updateBookmark, type Bookmark } from '@/lib/bookmarks';
 import { bookmarkSchema, type BookmarkInput } from '@/lib/schema';
 import { useTranslations } from 'next-intl';
 
 type BookmarkFormProps = {
+  bookmark?: Pick<Bookmark, 'id' | 'title' | 'url'>;
   onSuccess?: () => void;
   onCancel?: () => void;
 };
 
-export default function BookmarkForm({ onSuccess, onCancel }: BookmarkFormProps) {
+export default function BookmarkForm({ bookmark, onSuccess, onCancel }: BookmarkFormProps) {
   const t = useTranslations('form');
   const queryClient = useQueryClient();
 
@@ -28,11 +29,15 @@ export default function BookmarkForm({ onSuccess, onCancel }: BookmarkFormProps)
     formState: { errors },
   } = useForm<BookmarkInput>({
     resolver: zodResolver(bookmarkSchema),
-    defaultValues: { title: '', url: '' },
+    defaultValues: {
+      title: bookmark?.title ?? '',
+      url: bookmark?.url ?? '',
+    },
   });
 
   const mutation = useMutation({
-    mutationFn: addBookmark,
+    mutationFn: (input: BookmarkInput) =>
+      bookmark ? updateBookmark(bookmark.id, input) : addBookmark(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
       reset();
