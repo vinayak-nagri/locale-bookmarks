@@ -34,6 +34,11 @@
     "error": "Could not complete authentication. Please try again.",
     "toSignup": "Need an account? Sign up",
     "toSignin": "Already have an account? Sign in"
+  },
+  "landing": {
+    "title": "Locale Bookmarks",
+    "body": "Sign in to save and organize your bookmarks.",
+    "signin": "Sign in",
+    "signup": "Create an account"
   }
 }
-

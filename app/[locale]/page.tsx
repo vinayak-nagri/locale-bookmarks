@@ -1,7 +1,16 @@
 import BookmarksView from '@/components/BookmarksView';
+import SignedOutHome from '@/components/SignedOutHome';
+import { createServerSupabaseClient } from '@/lib/server';
 
-export default function HomePage() {
-//   const t = useTranslations('home');
-//   return <h1>{t('title')}</h1>;
- return <BookmarksView />;
+export default async function HomePage() {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return <SignedOutHome />;
+  }
+
+  return <BookmarksView />;
 }
