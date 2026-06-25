@@ -25,7 +25,12 @@
     "sortLabel": "Sort by",
     "sortNewest": "Newest",
     "sortUpdated": "Recently updated",
-    "sortAlphabetical": "Alphabetical"
+    "sortAlphabetical": "Alphabetical",
+    "view": {
+      "label": "View mode",
+      "list": "List",
+      "folder": "Folder"
+    }
   },
   "form": {
     "title": "Title",

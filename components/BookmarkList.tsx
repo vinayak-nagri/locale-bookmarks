@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, type MouseEvent, type ReactNode } from 'react';
 import {keepPreviousData, useQuery} from '@tanstack/react-query';
 import AppButton from '@/components/AppButton';
 import {fetchBookmarks, type Bookmark, type BookmarkSort} from '@/lib/bookmarks';
@@ -14,10 +14,13 @@ import Pagination from '@mui/material/Pagination';
 import Paper from '@mui/material/Paper';
 import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 
 const PAGE_SIZE = 7;
+type ViewMode = 'list' | 'folder';
 
 type BookmarkListProps = {
   onAdd: () => void;
@@ -29,6 +32,7 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
   const t = useTranslations('home');
   const [sortOption, setSortOption] = useState<BookmarkSort>('created_at');
   const [page, setPage] = useState(0);
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
   const {data, isLoading, isError, isFetching, refetch} = useQuery({
     queryKey: ['bookmarks', sortOption, page],
     queryFn: () => fetchBookmarks(sortOption, page, PAGE_SIZE),
@@ -50,6 +54,10 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
   function handleSortChange(event: SelectChangeEvent<BookmarkSort>) {
     setPage(0);
     setSortOption(event.target.value);
+  }
+
+  function handleViewModeChange(_event: MouseEvent<HTMLElement>, nextViewMode: ViewMode | null) {
+    if (nextViewMode) setViewMode(nextViewMode);
   }
 
   const sortControl = (
@@ -74,10 +82,43 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
     </FormControl>
   );
 
-  function renderWithSortControl(content: ReactNode) {
+  const viewToggle = (
+    <ToggleButtonGroup
+      exclusive
+      size="small"
+      value={viewMode}
+      aria-label={t('view.label')}
+      onChange={handleViewModeChange}
+      sx={{
+        alignSelf: { xs: 'stretch', sm: 'center' },
+        '& .MuiToggleButton-root': {
+          flex: { xs: 1, sm: '0 0 auto' },
+        },
+      }}
+    >
+      <ToggleButton value="list">
+        {t('view.list')}
+      </ToggleButton>
+      <ToggleButton value="folder">
+        {t('view.folder')}
+      </ToggleButton>
+    </ToggleButtonGroup>
+  );
+
+  function renderWithControls(content: ReactNode) {
     return (
       <Stack spacing={2}>
-        {sortControl}
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={1}
+          sx={{
+            alignItems: { xs: 'stretch', sm: 'center' },
+            justifyContent: 'space-between',
+          }}
+        >
+          {viewToggle}
+          {sortControl}
+        </Stack>
         {content}
       </Stack>
     );
@@ -93,8 +134,58 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
     }
   }
 
+  type BookmarkActionsProps = {
+    bookmark: Bookmark;
+    onEdit: (bookmark: Bookmark) => void;
+    onDelete: (bookmark: Bookmark) => void;
+  };
+
+  function BookmarkActions({ bookmark, onEdit, onDelete }: BookmarkActionsProps) {
+    return (
+      <Stack
+        direction="row"
+        spacing={1}
+        sx={{
+          flexShrink: 0,
+          flexWrap: 'wrap',
+          justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+        }}
+      >
+        <AppButton
+          variant="text"
+          size="small"
+          onClick={() => onEdit(bookmark)}
+        >
+          {t('edit')}
+        </AppButton>
+        <AppButton
+          variant="text"
+          color="error"
+          size="small"
+          onClick={() => onDelete(bookmark)}
+        >
+          {t('delete')}
+        </AppButton>
+        <AppButton
+          variant="outlined"
+          size="small"
+          onClick={() => window.open(bookmark.url, '_blank', 'noopener,noreferrer')}
+        >
+          {t('openLink')}
+        </AppButton>
+        <AppButton
+          variant="text"
+          size="small"
+          onClick={() => { void handleCopy(bookmark.id, bookmark.url); }}
+        >
+          {copiedId === bookmark.id ? t('copied') : t('copyLink')}
+        </AppButton>
+      </Stack>
+    );
+  }
+
   if (isLoading) {
-    return renderWithSortControl(
+    return renderWithControls(
       <Box
         component="ul"
         role="status"
@@ -128,7 +219,7 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
   }
 
   if (isError) {
-    return renderWithSortControl(
+    return renderWithControls(
       <Paper elevation={0} sx={{ p: { xs: 3, sm: 4 }, textAlign: 'center', borderRadius: 2, bgcolor: 'background.paper' }}>
         <Stack spacing={2} sx={{ alignItems: 'center' }}>
           <Typography variant="subtitle1" sx={{ color: 'error.main' }}>{t('error')}</Typography>
@@ -146,7 +237,7 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
   }
 
   if (!data || data.count === 0) {
-    return renderWithSortControl(
+    return renderWithControls(
       <Paper elevation={0} sx={{ p: { xs: 3, sm: 4 }, textAlign: 'center', borderRadius: 2, bgcolor: 'background.paper' }}>
         <Stack spacing={2} sx={{ alignItems: 'center' }}>
           <Typography variant="body1" sx={{ color: 'text.secondary' }}>{t('empty.message')}</Typography>
@@ -159,74 +250,74 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
   }
 
   const pageCount = Math.ceil(data.count / PAGE_SIZE);
+  const bookmarks = data.bookmarks;
 
-  return renderWithSortControl(
+  return renderWithControls(
     <Stack spacing={2}>
-      <Box
-        component="ul"
-        sx={{ listStyle: 'none', p: 0, m: 0, display: 'flex', flexDirection: 'column', gap: 0 }}
-      >
-        {data.bookmarks.map((b) => (
-          <Box
-            component="li"
-            key={b.id}
-            sx={{
-              display: 'flex',
-              flexDirection: { xs: 'column', sm: 'row' },
-              alignItems: { xs: 'stretch', sm: 'center' },
-              justifyContent: 'space-between',
-              gap: 1.5,
-              px: 2,
-              py: 1.5,
-              '&:not(:last-of-type)': { borderBottom: 1, borderColor: 'divider' },
-              '&:hover': { bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12) },
-            }}
-          >
-            <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-              <Typography variant="body1" sx={{ fontWeight: 500 }}>{b.title}</Typography>
-            </Box>
-            <Stack
-              direction="row"
-              spacing={1}
+      {viewMode === 'list' ? (
+        <Box
+          component="ul"
+          sx={{ listStyle: 'none', p: 0, m: 0, display: 'flex', flexDirection: 'column', gap: 0 }}
+        >
+          {bookmarks.map((b) => (
+            <Box
+              component="li"
+              key={b.id}
               sx={{
-                flexShrink: 0,
-                flexWrap: 'wrap',
-                justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+                display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
+                alignItems: { xs: 'stretch', sm: 'center' },
+                justifyContent: 'space-between',
+                gap: 1.5,
+                px: 2,
+                py: 1.5,
+                '&:not(:last-of-type)': { borderBottom: 1, borderColor: 'divider' },
+                '&:hover': { bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12) },
               }}
             >
-              <AppButton
-                variant="text"
-                size="small"
-                onClick={() => onEdit(b)}
-              >
-                {t('edit')}
-              </AppButton>
-              <AppButton
-                variant="text"
-                color="error"
-                size="small"
-                onClick={() => onDelete(b)}
-              >
-                {t('delete')}
-              </AppButton>
-              <AppButton
-                variant="outlined"
-                size="small"
-                onClick={() => window.open(b.url, '_blank', 'noopener,noreferrer')}
-              >
-                {t('openLink')}
-              </AppButton>
-              <AppButton
-                variant="text"
-                size="small"
-                onClick={() => { void handleCopy(b.id, b.url); }}
-              >
-                {copiedId === b.id ? t('copied') : t('copyLink')}
-              </AppButton>
-            </Stack>
-          </Box>
-        ))}
-      </Box>
+              <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                <Typography variant="body1" sx={{ fontWeight: 500 }}>{b.title}</Typography>
+              </Box>
+              <BookmarkActions bookmark={b} onEdit={onEdit} onDelete={onDelete} />
+            </Box>
+          ))}
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+            gap: 2,
+          }}
+        >
+          {bookmarks.map((b) => (
+            <Paper
+              component="article"
+              elevation={0}
+              key={b.id}
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                bgcolor: 'background.paper',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1.5,
+                minWidth: 0,
+              }}
+            >
+              <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  {b.title}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary', overflowWrap: 'anywhere' }}>
+                  {b.url}
+                </Typography>
+              </Box>
+              <BookmarkActions bookmark={b} onEdit={onEdit} onDelete={onDelete} />
+            </Paper>
+          ))}
+        </Box>
+      )}
 
       {data.count > PAGE_SIZE && (
         <Pagination

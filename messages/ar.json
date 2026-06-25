@@ -25,7 +25,12 @@
     "sortLabel": "ترتيب حسب",
     "sortNewest": "الأحدث",
     "sortUpdated": "آخر تحديث",
-    "sortAlphabetical": "أبجدي"
+    "sortAlphabetical": "أبجدي",
+    "view": {
+      "label": "طريقة العرض",
+      "list": "قائمة",
+      "folder": "مجلدات"
+    }
   },
   "form": {
     "title": "العنوان",
