@@ -30,6 +30,10 @@
       "label": "View mode",
       "list": "List",
       "folder": "Folder"
+    },
+    "theme": {
+      "toggle": "Theme",
+      "label": "Toggle light and dark mode"
     }
   },
   "form": {

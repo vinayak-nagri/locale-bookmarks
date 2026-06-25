@@ -10,6 +10,7 @@ import AppButton from '@/components/AppButton';
 import BookmarkList from '@/components/BookmarkList';
 import BookmarkDialog from '@/components/BookmarkDialog';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { useColorMode } from '@/app/[locale]/providers';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { supabase } from '@/lib/supabase';
@@ -23,6 +24,7 @@ export default function BookmarksView() {
   const authT = useTranslations('auth');
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { toggle } = useColorMode();
   const [open, setOpen] = useState(false);
   const [editingBookmark, setEditingBookmark] = useState<Bookmark | null>(null);
   const [deletingBookmark, setDeletingBookmark] = useState<Bookmark | null>(null);
@@ -64,8 +66,11 @@ export default function BookmarksView() {
       <Stack spacing={3}>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, gap: { xs: 1.5, sm: 0 } }}>
           <Typography variant="h5" component="h1">{t('title')}</Typography>
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
             <LanguageSwitcher />
+            <AppButton variant="text" aria-label={t('theme.label')} onClick={toggle}>
+              {t('theme.toggle')}
+            </AppButton>
             <AppButton component={Link} href="/profile" variant="text">
               {t('profile')}
             </AppButton>
