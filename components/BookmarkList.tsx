@@ -17,7 +17,8 @@ import Stack from '@mui/material/Stack';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
-import { alpha } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { alpha, useTheme } from '@mui/material/styles';
 
 const PAGE_SIZE = 7;
 type ViewMode = 'list' | 'folder';
@@ -30,9 +31,13 @@ type BookmarkListProps = {
 
 export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListProps) {
   const t = useTranslations('home');
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+  const defaultViewMode: ViewMode = isDesktop ? 'folder' : 'list';
   const [sortOption, setSortOption] = useState<BookmarkSort>('created_at');
   const [page, setPage] = useState(0);
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [manualViewMode, setManualViewMode] = useState<ViewMode | null>(null);
+  const viewMode = manualViewMode ?? defaultViewMode;
   const {data, isLoading, isError, isFetching, refetch} = useQuery({
     queryKey: ['bookmarks', sortOption, page],
     queryFn: () => fetchBookmarks(sortOption, page, PAGE_SIZE),
@@ -57,8 +62,21 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
   }
 
   function handleViewModeChange(_event: MouseEvent<HTMLElement>, nextViewMode: ViewMode | null) {
-    if (nextViewMode) setViewMode(nextViewMode);
+    if (!nextViewMode) return;
+
+    setManualViewMode(nextViewMode);
   }
+
+  const listSurfaceSx = {
+    width: '100%',
+    maxWidth: { xs: '100%', md: 760 },
+    mx: 'auto',
+    bgcolor: { md: 'background.paper' },
+    border: { xs: 0, md: 1 },
+    borderColor: 'divider',
+    borderRadius: { xs: 0, md: 2 },
+    overflow: 'hidden',
+  };
 
   const sortControl = (
     <FormControl
@@ -191,7 +209,7 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
         role="status"
         aria-label={t('loading')}
         aria-busy="true"
-        sx={{ listStyle: 'none', p: 0, m: 0, display: 'flex', flexDirection: 'column', gap: 1 }}
+        sx={{ ...listSurfaceSx, listStyle: 'none', p: 0, m: 0, display: 'flex', flexDirection: 'column', gap: 1 }}
       >
         {Array.from({length: 3}, (_, i) => (
           <Box
@@ -220,7 +238,7 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
 
   if (isError) {
     return renderWithControls(
-      <Paper elevation={0} sx={{ p: { xs: 3, sm: 4 }, textAlign: 'center', borderRadius: 2, bgcolor: 'background.paper' }}>
+      <Paper elevation={0} sx={{ p: { xs: 3, sm: 4 }, textAlign: 'center', borderRadius: 2, bgcolor: 'background.paper', maxWidth: { xs: '100%', md: 760 }, mx: 'auto', border: { xs: 0, md: 1 }, borderColor: 'divider' }}>
         <Stack spacing={2} sx={{ alignItems: 'center' }}>
           <Typography variant="subtitle1" sx={{ color: 'error.main' }}>{t('error')}</Typography>
           <AppButton
@@ -238,7 +256,7 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
 
   if (!data || data.count === 0) {
     return renderWithControls(
-      <Paper elevation={0} sx={{ p: { xs: 3, sm: 4 }, textAlign: 'center', borderRadius: 2, bgcolor: 'background.paper' }}>
+      <Paper elevation={0} sx={{ p: { xs: 3, sm: 4 }, textAlign: 'center', borderRadius: 2, bgcolor: 'background.paper', maxWidth: { xs: '100%', md: 760 }, mx: 'auto', border: { xs: 0, md: 1 }, borderColor: 'divider' }}>
         <Stack spacing={2} sx={{ alignItems: 'center' }}>
           <Typography variant="body1" sx={{ color: 'text.secondary' }}>{t('empty.message')}</Typography>
           <AppButton variant="contained" onClick={onAdd}>
@@ -255,38 +273,40 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
   return renderWithControls(
     <Stack spacing={2}>
       {viewMode === 'list' ? (
-        <Box
-          component="ul"
-          sx={{ listStyle: 'none', p: 0, m: 0, display: 'flex', flexDirection: 'column', gap: 0 }}
-        >
-          {bookmarks.map((b) => (
-            <Box
-              component="li"
-              key={b.id}
-              sx={{
-                display: 'flex',
-                flexDirection: { xs: 'column', sm: 'row' },
-                alignItems: { xs: 'stretch', sm: 'center' },
-                justifyContent: 'space-between',
-                gap: 1.5,
-                px: 2,
-                py: 1.5,
-                '&:not(:last-of-type)': { borderBottom: 1, borderColor: 'divider' },
-                '&:hover': { bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12) },
-              }}
-            >
-              <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                <Typography variant="body1" sx={{ fontWeight: 500 }}>{b.title}</Typography>
+        <Box sx={listSurfaceSx}>
+          <Box
+            component="ul"
+            sx={{ listStyle: 'none', p: 0, m: 0, display: 'flex', flexDirection: 'column', gap: 0 }}
+          >
+            {bookmarks.map((b) => (
+              <Box
+                component="li"
+                key={b.id}
+                sx={{
+                  display: 'flex',
+                  flexDirection: { xs: 'column', sm: 'row' },
+                  alignItems: { xs: 'stretch', sm: 'center' },
+                  justifyContent: 'space-between',
+                  gap: 1.5,
+                  px: 2,
+                  py: 1.5,
+                  '&:not(:last-of-type)': { borderBottom: 1, borderColor: 'divider' },
+                  '&:hover': { bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12) },
+                }}
+              >
+                <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>{b.title}</Typography>
+                </Box>
+                <BookmarkActions bookmark={b} onEdit={onEdit} onDelete={onDelete} />
               </Box>
-              <BookmarkActions bookmark={b} onEdit={onEdit} onDelete={onDelete} />
-            </Box>
-          ))}
+            ))}
+          </Box>
         </Box>
       ) : (
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+            gridTemplateColumns: { xs: 'repeat(auto-fill, minmax(240px, 1fr))', md: 'repeat(auto-fill, minmax(280px, 1fr))' },
             gap: 2,
           }}
         >

@@ -4,7 +4,6 @@ import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import AppButton from '@/components/AppButton';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 
@@ -17,14 +16,12 @@ export default function SignedOutHome() {
       sx={{
         py: 4,
         px: { xs: 2, sm: 3 },
-        minHeight: '60vh',
+        minHeight: { xs: '60vh', md: 'calc(100dvh - 65px)' },
         display: 'flex',
         alignItems: 'center',
       }}
     >
       <Stack spacing={3} sx={{ width: '100%', alignItems: 'center', textAlign: 'center' }}>
-        <LanguageSwitcher />
-
         <Stack spacing={1.5} sx={{ alignItems: 'center' }}>
           <Typography variant="h4" component="h1">
             {t('title')}
