@@ -29,6 +29,15 @@ type BookmarkListProps = {
   onDelete: (bookmark: Bookmark) => void;
 };
 
+function getFaviconUrl(url: string): string | null {
+  try {
+    const { hostname } = new URL(url);
+    return `https://www.google.com/s2/favicons?domain=${hostname}&sz=32`;
+  } catch {
+    return null;
+  }
+}
+
 export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListProps) {
   const t = useTranslations('home');
   const theme = useTheme();
@@ -310,34 +319,51 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
             gap: 2,
           }}
         >
-          {bookmarks.map((b) => (
-            <Paper
-              component="article"
-              elevation={0}
-              key={b.id}
-              sx={{
-                p: 2,
-                borderRadius: 2,
-                border: 1,
-                borderColor: 'divider',
-                bgcolor: 'background.paper',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 1.5,
-                minWidth: 0,
-              }}
-            >
-              <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                  {b.title}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary', overflowWrap: 'anywhere' }}>
-                  {b.url}
-                </Typography>
-              </Box>
-              <BookmarkActions bookmark={b} onEdit={onEdit} onDelete={onDelete} />
-            </Paper>
-          ))}
+          {bookmarks.map((b) => {
+            const faviconUrl = getFaviconUrl(b.url);
+
+            return (
+              <Paper
+                component="article"
+                elevation={0}
+                key={b.id}
+                sx={{
+                  p: 2,
+                  borderRadius: 2,
+                  border: 1,
+                  borderColor: 'divider',
+                  bgcolor: 'background.paper',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1.5,
+                  minWidth: 0,
+                }}
+              >
+                <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                    {faviconUrl && (
+                      <Box
+                        component="img"
+                        src={faviconUrl}
+                        alt=""
+                        width={20}
+                        height={20}
+                        referrerPolicy="no-referrer"
+                        sx={{ flexShrink: 0 }}
+                      />
+                    )}
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600, minWidth: 0 }}>
+                      {b.title}
+                    </Typography>
+                  </Box>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', overflowWrap: 'anywhere' }}>
+                    {b.url}
+                  </Typography>
+                </Box>
+                <BookmarkActions bookmark={b} onEdit={onEdit} onDelete={onDelete} />
+              </Paper>
+            );
+          })}
         </Box>
       )}
 
