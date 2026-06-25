@@ -27,6 +27,9 @@
     "sortNewest": "Newest",
     "sortUpdated": "Recently updated",
     "sortAlphabetical": "Alphabetical",
+    "searchLabel": "Search",
+    "searchPlaceholder": "Search by title",
+    "noResults": "No bookmarks match your search.",
     "view": {
       "label": "View mode",
       "list": "List",

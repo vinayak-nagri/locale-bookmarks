@@ -27,6 +27,9 @@
     "sortNewest": "الأحدث",
     "sortUpdated": "آخر تحديث",
     "sortAlphabetical": "أبجدي",
+    "searchLabel": "بحث",
+    "searchPlaceholder": "ابحث حسب العنوان",
+    "noResults": "لا توجد إشارات مرجعية تطابق بحثك.",
     "view": {
       "label": "طريقة العرض",
       "list": "قائمة",

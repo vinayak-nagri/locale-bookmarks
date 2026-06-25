@@ -14,6 +14,7 @@ import Pagination from '@mui/material/Pagination';
 import Paper from '@mui/material/Paper';
 import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
@@ -44,16 +45,28 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
   const defaultViewMode: ViewMode = isDesktop ? 'folder' : 'list';
   const [sortOption, setSortOption] = useState<BookmarkSort>('created_at');
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
   const [manualViewMode, setManualViewMode] = useState<ViewMode | null>(null);
   const viewMode = manualViewMode ?? defaultViewMode;
   const {data, isLoading, isError, isFetching, refetch} = useQuery({
-    queryKey: ['bookmarks', sortOption, page],
-    queryFn: () => fetchBookmarks(sortOption, page, PAGE_SIZE),
+    queryKey: ['bookmarks', sortOption, page, search],
+    queryFn: () => fetchBookmarks(sortOption, page, PAGE_SIZE, search),
     placeholderData: keepPreviousData,
   });
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const hasActiveSearch = search.trim().length > 0;
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setSearch(searchInput);
+      setPage(0);
+    }, 300);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [searchInput]);
 
   useEffect(() => {
     if (!data) return;
@@ -109,6 +122,20 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
     </FormControl>
   );
 
+  const searchControl = (
+    <TextField
+      size="small"
+      label={t('searchLabel')}
+      placeholder={t('searchPlaceholder')}
+      value={searchInput}
+      onChange={(event) => setSearchInput(event.target.value)}
+      sx={{
+        minWidth: { xs: '100%', sm: 240 },
+        flexGrow: { sm: 1 },
+      }}
+    />
+  );
+
   const viewToggle = (
     <ToggleButtonGroup
       exclusive
@@ -144,6 +171,7 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
           }}
         >
           {viewToggle}
+          {searchControl}
           {sortControl}
         </Stack>
         {content}
@@ -267,10 +295,14 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
     return renderWithControls(
       <Paper elevation={0} sx={{ p: { xs: 3, sm: 4 }, textAlign: 'center', borderRadius: 2, bgcolor: 'background.paper', maxWidth: { xs: '100%', md: 760 }, mx: 'auto', border: { xs: 0, md: 1 }, borderColor: 'divider' }}>
         <Stack spacing={2} sx={{ alignItems: 'center' }}>
-          <Typography variant="body1" sx={{ color: 'text.secondary' }}>{t('empty.message')}</Typography>
-          <AppButton variant="contained" onClick={onAdd}>
-            {t('empty.cta')}
-          </AppButton>
+          <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+            {hasActiveSearch ? t('noResults') : t('empty.message')}
+          </Typography>
+          {!hasActiveSearch && (
+            <AppButton variant="contained" onClick={onAdd}>
+              {t('empty.cta')}
+            </AppButton>
+          )}
         </Stack>
       </Paper>
     );

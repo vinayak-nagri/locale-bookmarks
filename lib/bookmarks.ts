@@ -18,7 +18,8 @@ export type FetchBookmarksResult = {
 export async function fetchBookmarks(
   sort: BookmarkSort,
   page: number,
-  pageSize: number
+  pageSize: number,
+  search?: string
 ): Promise<FetchBookmarksResult> {
   const sortConfig: Record<BookmarkSort, { column: string; ascending: boolean }> = {
     created_at: { column: 'created_at', ascending: false },
@@ -28,11 +29,17 @@ export async function fetchBookmarks(
   const { column, ascending } = sortConfig[sort];
   const from = page * pageSize;
   const to = from + pageSize - 1;
-  const { data, error, count } = await supabase
+  let query = supabase
     .from('bookmarks')
     .select('*', { count: 'exact' })
-    .order(column, { ascending })
-    .range(from, to);
+    .order(column, { ascending });
+
+  const term = search?.trim();
+  if (term) {
+    query = query.ilike('title', `%${term}%`);
+  }
+
+  const { data, error, count } = await query.range(from, to);
 
   if (error) throw error;
   return { bookmarks: data ?? [], count: count ?? 0 };
