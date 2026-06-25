@@ -8,11 +8,19 @@ export type Bookmark = {
   created_at: string;
 };
 
-export async function fetchBookmarks(): Promise<Bookmark[]> {
+export type BookmarkSort = 'created_at' | 'updated_at' | 'title';
+
+export async function fetchBookmarks(sort: BookmarkSort): Promise<Bookmark[]> {
+  const sortConfig: Record<BookmarkSort, { column: string; ascending: boolean }> = {
+    created_at: { column: 'created_at', ascending: false },
+    updated_at: { column: 'updated_at', ascending: false },
+    title: { column: 'title', ascending: true },
+  };
+  const { column, ascending } = sortConfig[sort];
   const { data, error } = await supabase
     .from('bookmarks')
     .select('*')
-    .order('created_at', { ascending: false });
+    .order(column, { ascending });
 
   if (error) throw error;
   return data ?? [];

@@ -1,13 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import {useQuery} from '@tanstack/react-query';
 import AppButton from '@/components/AppButton';
-import {fetchBookmarks, type Bookmark} from '@/lib/bookmarks';
+import {fetchBookmarks, type Bookmark, type BookmarkSort} from '@/lib/bookmarks';
 import { useTranslations } from 'next-intl';
 import Skeleton from '@mui/material/Skeleton';
 import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
+import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
@@ -19,13 +23,49 @@ type BookmarkListProps = {
 };
 
 export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListProps) {
+  const t = useTranslations('home');
+  const [sortOption, setSortOption] = useState<BookmarkSort>('created_at');
   const {data, isLoading, isError, isFetching, refetch} = useQuery({
-    queryKey: ['bookmarks'],
-    queryFn: fetchBookmarks,
+    queryKey: ['bookmarks', sortOption],
+    queryFn: () => fetchBookmarks(sortOption),
   });
 
-  const t = useTranslations('home');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  function handleSortChange(event: SelectChangeEvent<BookmarkSort>) {
+    setSortOption(event.target.value);
+  }
+
+  const sortControl = (
+    <FormControl
+      size="small"
+      sx={{
+        minWidth: { xs: '100%', sm: 220 },
+        alignSelf: { xs: 'stretch', sm: 'flex-end' },
+      }}
+    >
+      <InputLabel id="bookmark-sort-label">{t('sortLabel')}</InputLabel>
+      <Select<BookmarkSort>
+        labelId="bookmark-sort-label"
+        value={sortOption}
+        label={t('sortLabel')}
+        onChange={handleSortChange}
+      >
+        <MenuItem value="created_at">{t('sortNewest')}</MenuItem>
+        <MenuItem value="updated_at">{t('sortUpdated')}</MenuItem>
+        <MenuItem value="title">{t('sortAlphabetical')}</MenuItem>
+      </Select>
+    </FormControl>
+  );
+
+  function renderWithSortControl(content: ReactNode) {
+    return (
+      <Stack spacing={2}>
+        {sortControl}
+        {content}
+      </Stack>
+    );
+  }
 
   async function handleCopy(id: string, url: string) {
     try {
@@ -38,7 +78,7 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
   }
 
   if (isLoading) {
-    return (
+    return renderWithSortControl(
       <Box
         component="ul"
         role="status"
@@ -72,7 +112,7 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
   }
 
   if (isError) {
-    return (
+    return renderWithSortControl(
       <Paper elevation={0} sx={{ p: { xs: 3, sm: 4 }, textAlign: 'center', borderRadius: 2, bgcolor: 'background.paper' }}>
         <Stack spacing={2} sx={{ alignItems: 'center' }}>
           <Typography variant="subtitle1" sx={{ color: 'error.main' }}>{t('error')}</Typography>
@@ -90,7 +130,7 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
   }
 
   if (!data || data.length === 0) {
-    return (
+    return renderWithSortControl(
       <Paper elevation={0} sx={{ p: { xs: 3, sm: 4 }, textAlign: 'center', borderRadius: 2, bgcolor: 'background.paper' }}>
         <Stack spacing={2} sx={{ alignItems: 'center' }}>
           <Typography variant="body1" sx={{ color: 'text.secondary' }}>{t('empty.message')}</Typography>
@@ -102,7 +142,7 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
     );
   }
 
-  return (
+  return renderWithSortControl(
     <Box
       component="ul"
       sx={{ listStyle: 'none', p: 0, m: 0, display: 'flex', flexDirection: 'column', gap: 0 }}

@@ -21,7 +21,11 @@
     "deleteBody": "هل أنت متأكد من حذف هذه الإشارة المرجعية؟",
     "deleteConfirm": "حذف",
     "deleteCancel": "إلغاء",
-    "deleteError": "تعذّر حذف الإشارة المرجعية. يُرجى المحاولة مرة أخرى."
+    "deleteError": "تعذّر حذف الإشارة المرجعية. يُرجى المحاولة مرة أخرى.",
+    "sortLabel": "ترتيب حسب",
+    "sortNewest": "الأحدث",
+    "sortUpdated": "آخر تحديث",
+    "sortAlphabetical": "أبجدي"
   },
   "form": {
     "title": "العنوان",

@@ -21,7 +21,11 @@
     "deleteBody": "Are you sure you want to delete this bookmark?",
     "deleteConfirm": "Delete",
     "deleteCancel": "Cancel",
-    "deleteError": "Could not delete the bookmark. Please try again."
+    "deleteError": "Could not delete the bookmark. Please try again.",
+    "sortLabel": "Sort by",
+    "sortNewest": "Newest",
+    "sortUpdated": "Recently updated",
+    "sortAlphabetical": "Alphabetical"
   },
   "form": {
     "title": "Title",
