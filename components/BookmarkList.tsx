@@ -20,7 +20,7 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { alpha, useTheme } from '@mui/material/styles';
 
-const PAGE_SIZE = 7;
+const PAGE_SIZE = 6;
 type ViewMode = 'list' | 'folder';
 
 type BookmarkListProps = {
@@ -318,6 +318,8 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
               sx={{
                 p: 2,
                 borderRadius: 2,
+                border: 1,
+                borderColor: 'divider',
                 bgcolor: 'background.paper',
                 display: 'flex',
                 flexDirection: 'column',

@@ -1,6 +1,7 @@
 {
   "home": {
     "title": "My Bookmarks",
+    "greeting": "Hi, {name}",
     "add": "Add bookmark",
     "loading": "Loading your bookmarks…",
     "error": "Could not load your bookmarks.",
@@ -49,6 +50,10 @@
     "signupTitle": "Sign up",
     "email": "Email",
     "password": "Password",
+    "displayNameLabel": "Display name",
+    "localeLabel": "Preferred language",
+    "localeEn": "English",
+    "localeAr": "Arabic",
     "signin": "Sign in",
     "signup": "Sign up",
     "submitting": "Submitting...",
@@ -59,6 +64,7 @@
   },
   "landing": {
     "title": "Locale Bookmarks",
+    "welcome": "Welcome",
     "body": "Sign in to save and organize your bookmarks.",
     "signin": "Sign in",
     "signup": "Create an account"

@@ -24,6 +24,10 @@ type ProfileFormProps = {
   initialPreferredLocale: ProfileInput['preferred_locale'];
 };
 
+function writeLocaleCookie(locale: ProfileInput['preferred_locale']) {
+  document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000; SameSite=Lax`;
+}
+
 export default function ProfileForm({
   userId,
   initialDisplayName,
@@ -53,12 +57,16 @@ export default function ProfileForm({
         .upsert({ id: userId, display_name, preferred_locale });
 
       if (error) throw error;
+
+      return preferred_locale;
     },
     onMutate: () => {
       setSaved(false);
     },
-    onSuccess: () => {
+    onSuccess: (preferredLocale) => {
+      writeLocaleCookie(preferredLocale);
       setSaved(true);
+      router.replace('/profile', { locale: preferredLocale });
       router.refresh();
     },
   });

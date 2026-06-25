@@ -13,6 +13,11 @@ export const authSchema = z.object({
   password: z.string().min(6),
 });
 
+export const signUpSchema = authSchema.extend({
+  displayName: z.string().min(1),
+  preferredLocale: z.enum(['en', 'ar']),
+});
+
 export const profileSchema = z.object({
   display_name: z
     .string()
@@ -22,4 +27,5 @@ export const profileSchema = z.object({
 });
 
 export type BookmarkInput = z.infer<typeof bookmarkSchema>;
+export type SignUpInput = z.infer<typeof signUpSchema>;
 export type ProfileInput = z.infer<typeof profileSchema>;

@@ -12,5 +12,12 @@ export default async function HomePage() {
     return <SignedOutHome />;
   }
 
-  return <BookmarksView />;
+  const { data } = await supabase
+    .from('profiles')
+    .select('display_name')
+    .eq('id', user.id)
+    .maybeSingle();
+  const displayName = data?.display_name?.trim() || undefined;
+
+  return <BookmarksView displayName={displayName} />;
 }

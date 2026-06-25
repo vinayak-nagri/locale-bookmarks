@@ -24,7 +24,7 @@ export default function SignedOutHome() {
       <Stack spacing={3} sx={{ width: '100%', alignItems: 'center', textAlign: 'center' }}>
         <Stack spacing={1.5} sx={{ alignItems: 'center' }}>
           <Typography variant="h4" component="h1">
-            {t('title')}
+            {t('welcome')}
           </Typography>
           <Typography variant="body1" sx={{ color: 'text.secondary' }}>
             {t('body')}

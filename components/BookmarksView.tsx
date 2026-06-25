@@ -14,8 +14,11 @@ import { useTranslations } from 'next-intl';
 import { deleteBookmark, type Bookmark } from '@/lib/bookmarks';
 import Typography from '@mui/material/Typography';
 
+type BookmarksViewProps = {
+  displayName?: string;
+};
 
-export default function BookmarksView() {
+export default function BookmarksView({ displayName }: BookmarksViewProps) {
   const t = useTranslations('home');
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -52,7 +55,14 @@ export default function BookmarksView() {
     <Container maxWidth="sm" sx={{ py: 4, px: { xs: 2, sm: 3, md: 0 }, maxWidth: { md: 'none' } }}>
       <Stack spacing={3}>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, gap: { xs: 1.5, sm: 0 } }}>
-          <Typography variant="h5" component="h1">{t('title')}</Typography>
+          <Box>
+            <Typography variant="h5" component="h1">{t('title')}</Typography>
+            {displayName && (
+              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+                {t('greeting', { name: displayName })}
+              </Typography>
+            )}
+          </Box>
           <AppButton variant="contained" onClick={() => setOpen(true)}>
             {t('add')}
           </AppButton>
