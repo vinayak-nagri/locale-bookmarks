@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
-import {useQuery} from '@tanstack/react-query';
+import { useEffect, useState, type ReactNode } from 'react';
+import {keepPreviousData, useQuery} from '@tanstack/react-query';
 import AppButton from '@/components/AppButton';
 import {fetchBookmarks, type Bookmark, type BookmarkSort} from '@/lib/bookmarks';
 import { useTranslations } from 'next-intl';
@@ -10,11 +10,14 @@ import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import Pagination from '@mui/material/Pagination';
 import Paper from '@mui/material/Paper';
 import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
+
+const PAGE_SIZE = 7;
 
 type BookmarkListProps = {
   onAdd: () => void;
@@ -25,14 +28,27 @@ type BookmarkListProps = {
 export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListProps) {
   const t = useTranslations('home');
   const [sortOption, setSortOption] = useState<BookmarkSort>('created_at');
+  const [page, setPage] = useState(0);
   const {data, isLoading, isError, isFetching, refetch} = useQuery({
-    queryKey: ['bookmarks', sortOption],
-    queryFn: () => fetchBookmarks(sortOption),
+    queryKey: ['bookmarks', sortOption, page],
+    queryFn: () => fetchBookmarks(sortOption, page, PAGE_SIZE),
+    placeholderData: keepPreviousData,
   });
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!data) return;
+
+    const lastPage = Math.max(0, Math.ceil(data.count / PAGE_SIZE) - 1);
+    if (page <= lastPage) return;
+
+    const timeoutId = window.setTimeout(() => setPage(lastPage), 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [data, page]);
+
   function handleSortChange(event: SelectChangeEvent<BookmarkSort>) {
+    setPage(0);
     setSortOption(event.target.value);
   }
 
@@ -129,7 +145,7 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
     );
   }
 
-  if (!data || data.length === 0) {
+  if (!data || data.count === 0) {
     return renderWithSortControl(
       <Paper elevation={0} sx={{ p: { xs: 3, sm: 4 }, textAlign: 'center', borderRadius: 2, bgcolor: 'background.paper' }}>
         <Stack spacing={2} sx={{ alignItems: 'center' }}>
@@ -142,71 +158,84 @@ export default function BookmarkList({ onAdd, onEdit, onDelete }: BookmarkListPr
     );
   }
 
+  const pageCount = Math.ceil(data.count / PAGE_SIZE);
+
   return renderWithSortControl(
-    <Box
-      component="ul"
-      sx={{ listStyle: 'none', p: 0, m: 0, display: 'flex', flexDirection: 'column', gap: 0 }}
-    >
-      {data.map((b) => (
-        <Box
-          component="li"
-          key={b.id}
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            alignItems: { xs: 'stretch', sm: 'center' },
-            justifyContent: 'space-between',
-            gap: 1.5,
-            px: 2,
-            py: 1.5,
-            '&:not(:last-of-type)': { borderBottom: 1, borderColor: 'divider' },
-            '&:hover': { bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12) },
-          }}
-        >
-          <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-            <Typography variant="body1" sx={{ fontWeight: 500 }}>{b.title}</Typography>
-          </Box>
-          <Stack
-            direction="row"
-            spacing={1}
+    <Stack spacing={2}>
+      <Box
+        component="ul"
+        sx={{ listStyle: 'none', p: 0, m: 0, display: 'flex', flexDirection: 'column', gap: 0 }}
+      >
+        {data.bookmarks.map((b) => (
+          <Box
+            component="li"
+            key={b.id}
             sx={{
-              flexShrink: 0,
-              flexWrap: 'wrap',
-              justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
+              alignItems: { xs: 'stretch', sm: 'center' },
+              justifyContent: 'space-between',
+              gap: 1.5,
+              px: 2,
+              py: 1.5,
+              '&:not(:last-of-type)': { borderBottom: 1, borderColor: 'divider' },
+              '&:hover': { bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12) },
             }}
           >
-            <AppButton
-              variant="text"
-              size="small"
-              onClick={() => onEdit(b)}
+            <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+              <Typography variant="body1" sx={{ fontWeight: 500 }}>{b.title}</Typography>
+            </Box>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                flexShrink: 0,
+                flexWrap: 'wrap',
+                justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+              }}
             >
-              {t('edit')}
-            </AppButton>
-            <AppButton
-              variant="text"
-              color="error"
-              size="small"
-              onClick={() => onDelete(b)}
-            >
-              {t('delete')}
-            </AppButton>
-            <AppButton
-              variant="outlined"
-              size="small"
-              onClick={() => window.open(b.url, '_blank', 'noopener,noreferrer')}
-            >
-              {t('openLink')}
-            </AppButton>
-            <AppButton
-              variant="text"
-              size="small"
-              onClick={() => { void handleCopy(b.id, b.url); }}
-            >
-              {copiedId === b.id ? t('copied') : t('copyLink')}
-            </AppButton>
-          </Stack>
-        </Box>
-      ))}
-    </Box>
+              <AppButton
+                variant="text"
+                size="small"
+                onClick={() => onEdit(b)}
+              >
+                {t('edit')}
+              </AppButton>
+              <AppButton
+                variant="text"
+                color="error"
+                size="small"
+                onClick={() => onDelete(b)}
+              >
+                {t('delete')}
+              </AppButton>
+              <AppButton
+                variant="outlined"
+                size="small"
+                onClick={() => window.open(b.url, '_blank', 'noopener,noreferrer')}
+              >
+                {t('openLink')}
+              </AppButton>
+              <AppButton
+                variant="text"
+                size="small"
+                onClick={() => { void handleCopy(b.id, b.url); }}
+              >
+                {copiedId === b.id ? t('copied') : t('copyLink')}
+              </AppButton>
+            </Stack>
+          </Box>
+        ))}
+      </Box>
+
+      {data.count > PAGE_SIZE && (
+        <Pagination
+          count={pageCount}
+          page={page + 1}
+          onChange={(_, value) => setPage(value - 1)}
+          sx={{ alignSelf: 'center' }}
+        />
+      )}
+    </Stack>
   );
 }

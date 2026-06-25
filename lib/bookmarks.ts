@@ -10,20 +10,32 @@ export type Bookmark = {
 
 export type BookmarkSort = 'created_at' | 'updated_at' | 'title';
 
-export async function fetchBookmarks(sort: BookmarkSort): Promise<Bookmark[]> {
+export type FetchBookmarksResult = {
+  bookmarks: Bookmark[];
+  count: number;
+};
+
+export async function fetchBookmarks(
+  sort: BookmarkSort,
+  page: number,
+  pageSize: number
+): Promise<FetchBookmarksResult> {
   const sortConfig: Record<BookmarkSort, { column: string; ascending: boolean }> = {
     created_at: { column: 'created_at', ascending: false },
     updated_at: { column: 'updated_at', ascending: false },
     title: { column: 'title', ascending: true },
   };
   const { column, ascending } = sortConfig[sort];
-  const { data, error } = await supabase
+  const from = page * pageSize;
+  const to = from + pageSize - 1;
+  const { data, error, count } = await supabase
     .from('bookmarks')
-    .select('*')
-    .order(column, { ascending });
+    .select('*', { count: 'exact' })
+    .order(column, { ascending })
+    .range(from, to);
 
   if (error) throw error;
-  return data ?? [];
+  return { bookmarks: data ?? [], count: count ?? 0 };
 }
 
 export async function addBookmark(input: BookmarkInput): Promise<void> {
